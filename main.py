@@ -1,5 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
+from datetime import datetime, timedelta
 import re
 
 geekbrainsReq = requests.get("https://geekbrains.ru/events")
@@ -8,9 +9,19 @@ geekbrainsText = geekbrainsReq.text
 soup = BeautifulSoup(geekbrainsText, 'lxml')
 findList = soup.find("div", attrs={ 'class' : 'gb-future-events__items'})
 
+mouthList = ("января", "февраля","марта","апреля","мая","июня", "июля",
+         "августа", "сентября", "октября", "ноября", "декабря")
 
 i = 0
-monthFirst = ""
+
+dif = 7 - datetime.now().isoweekday()
+
+print(dif)
+listDate = []
+for d in range(1, 7):
+    listDate.append(datetime.now() + timedelta(days=dif + d))
+
+print(listDate)
 
 for child in findList.children:
     date = child.find("div", attrs={ 'class' : 'gb-event-info__datetime'})
@@ -19,19 +30,25 @@ for child in findList.children:
     countPeople = ElementInfo.li.text
     link = "https://geekbrains.ru" + title.a.get("href")
 
+    day = date.text.split(" ")[1]
+    day = re.sub('\,|\.', '', day)
+    day = int(day.strip())
+
     month = date.text.split(" ")[2]
     month = re.sub('\,|\.', '', month)
 
-    if i == 0:
-        monthFirst = date.text.split(" ")[2]
-        monthFirst = re.sub('\,|\.', '', monthFirst)
+    skip = True
 
-    if int(countPeople) < 30:
+    for i, m in enumerate(mouthList):
+        if month in m:
+
+            for lDate in listDate:
+                if day == lDate.day and i + 1 == lDate.month:
+                    print("Good")
+                    skip = False
+
+    if skip:
         continue
-
-    if monthFirst != month:
-        break
-
 
     i += 1
 
@@ -43,3 +60,4 @@ for child in findList.children:
     print()
 
 print("Количество записей:", i)
+
