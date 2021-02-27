@@ -15,6 +15,11 @@ mouthList = ("января", "февраля","марта","апреля","ма�
 testPost = "Приглашаем принять участие в вебинарах\n\n"
 dif = 7 - datetime.now().isoweekday()
 
+# ktk-45
+# headers = {"Authorization" : "7cae34465dce7b9a1dea92a96bf3c9e3e1260fed2f168e9721efa0c955f1e9cc"}
+# ktk-dev
+headers = {"Authorization" : "8eef307acfc5d02c4a7558b529ceefb6fa11f52c856a86979ebc430c3f02122a"}
+
 listDate = []
 for d in range(1, 7):
     listDate.append(datetime.now() + timedelta(days=dif + d))
@@ -25,8 +30,15 @@ for child in findList.children:
     ElementInfo = child.find("ul", attrs={ 'class' : 'gb-item-stats gb-event-info__item'})
     link = "https://geekbrains.ru" + title.a.get("href")
 
+    
+
     if date == None or title == None or ElementInfo == None:
         continue
+
+    times = date.text.split(",")[2].strip()[:5]
+
+    hour = int(times.split(":")[0])
+    min = int(times.split(":")[1])
 
     countPeople = ElementInfo.li.text
 
@@ -39,15 +51,33 @@ for child in findList.children:
 
     skip = True
 
+    saveDate = None
+
     for i, m in enumerate(mouthList):
         if month in m:
             for lDate in listDate:
                 if day == lDate.day and i + 1 == lDate.month:
                     skip = False
+                    saveDate = lDate
+                    
+                    saveDate.hour = hour
+                    saveDate.min = min
+                    saveDate.second = 0
+
 
     if skip:
         continue
+    
+    # saveDate.timedelta(hours=)
+
+    # requests.post("http://ktk-dev.ru/api/event/insert", headers=headers, data={
+    #     "Date" : 
+    # })
+
+    print(saveDate)
     testPost += f"✅ {date.text} — «{title.text}»: {link}\n\n"
+
+
 
 print(testPost)
 print("Количество записей:", i)
