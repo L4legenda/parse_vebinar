@@ -38,7 +38,7 @@ for child in findList.children:
     times = date.text.split(",")[2].strip()[:5]
 
     hour = int(times.split(":")[0])
-    min = int(times.split(":")[1])
+    minute = int(times.split(":")[1])
 
     countPeople = ElementInfo.li.text
 
@@ -59,26 +59,22 @@ for child in findList.children:
                 if day == lDate.day and i + 1 == lDate.month:
                     skip = False
                     saveDate = lDate
-                    
-                    saveDate.hour = hour
-                    saveDate.min = min
-                    saveDate.second = 0
-
-
     if skip:
         continue
+
+    saveDate = saveDate.replace(hour=hour, minute=minute, second=0)
     
+    # print(saveDate + " " + times)
+    # print(datetime.strptime(saveDate + " " + times, ""))
+
     # saveDate.timedelta(hours=)
 
     # requests.post("http://ktk-dev.ru/api/event/insert", headers=headers, data={
     #     "Date" : 
     # })
-
-    print(saveDate)
-    testPost += f"✅ {date.text} — «{title.text}»: {link}\n\n"
-
-
-
-print(testPost)
-print("Количество записей:", i)
+    print("Название:", title.text)
+    print("Место проведение:", "Онлайн")
+    print("Время начала:", saveDate)
+    print("Ссылка:", link)
+    print()
 
